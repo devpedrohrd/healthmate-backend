@@ -8,6 +8,7 @@ import { secureHeaders } from "hono/secure-headers";
 
 import { loginRoutes } from "./routes/login";
 import { userRoutes } from "./routes/user";
+import { pacientRoutes } from "./routes/pacient";
 import { JWT_SECRET } from "./controllers/login";
 
 const app = new Hono();
@@ -22,29 +23,30 @@ app.get("/", (c) => {
   return c.text("API rodando! 🚀👌");
 });
 
-app.use("/api/users/*", async (c, next) => {
-  const tokenFromCookie = await getSignedCookie(c, JWT_SECRET, "token");
-  console.log("Token from Cookie:", tokenFromCookie);
+// app.use("/api/users/*", async (c, next) => {
+//   const tokenFromCookie = await getSignedCookie(c, JWT_SECRET, "token");
+//   console.log("Token from Cookie:", tokenFromCookie);
 
-  const authHeader = c.req.header("Authorization");
-  console.log("Authorization Header:", authHeader);
+//   const authHeader = c.req.header("Authorization");
+//   console.log("Authorization Header:", authHeader);
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return c.json({ error: "Nao autorizado" }, 401);
-  }
+//   if (!authHeader || !authHeader.startsWith("Bearer ")) {
+//     return c.json({ error: "Nao autorizado" }, 401);
+//   }
 
-  const tokenFromHeader = authHeader.substring(7);
-  console.log("Token from Header:", tokenFromHeader);
+//   const tokenFromHeader = authHeader.substring(7);
+//   console.log("Token from Header:", tokenFromHeader);
 
-  if (tokenFromCookie !== tokenFromHeader) {
-    return c.json({ error: "Nao autorizado" }, 401);
-  }
+//   if (tokenFromCookie !== tokenFromHeader) {
+//     return c.json({ error: "Nao autorizado" }, 401);
+//   }
 
-  await next();
-});
+//   await next();
+// });
 
 app.route("/api/users", userRoutes);
 app.route("/api/login", loginRoutes);
+app.route("/api/pacients", pacientRoutes);
 
 const port = parseInt(Bun.env.PORT as string, 10) || 3000;
 
