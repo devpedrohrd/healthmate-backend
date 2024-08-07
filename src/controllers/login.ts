@@ -1,11 +1,12 @@
 import { Context } from "hono";
-import { setCookie, setSignedCookie } from "hono/cookie";
+import { setCookie } from "hono/cookie";
 import { sign } from "hono/jwt";
 import { ZodError } from "zod";
 
 import { prisma } from "../config/Prisma";
+import { loginSchema } from "../schema/login";
 
-export const JWT_SECRET = process.env.JWT_SECRET || "";
+const JWT_SECRET = Bun.env.JWT_SECRET || "your_jwt_secret";
 
 const createToken = async (payload: any) => {
   return sign(payload, JWT_SECRET, "HS256");
@@ -13,17 +14,19 @@ const createToken = async (payload: any) => {
 
 export const login = async (c: Context) => {
   try {
-    const { email, senha } = await c.req.json();
+    const body = await c.req.json();
+
+    const parseData = loginSchema.parse(body);
 
     const user = await prisma.user.findFirst({
-      where: { email },
+      where: { email: parseData.email },
     });
 
     if (!user) {
       return c.json({ error: "Usuario nao encontrado" }, 404);
     }
 
-    const compareHash = await Bun.password.verify(senha, user.senha);
+    const compareHash = await Bun.password.verify(parseData.senha, user.senha);
 
     if (!compareHash) {
       return c.json({ error: "Senha invalida" }, 400);
@@ -32,20 +35,13 @@ export const login = async (c: Context) => {
     const token = await createToken({
       id: user.id,
       email: user.email,
-      exp: Math.floor(Date.now() / 1000) + 60 * 60, // esse token expira em 1 hora
     });
 
-    console.log("Generated Token:", token);
-
-    await setSignedCookie(c, "token", token, JWT_SECRET, {
-      path: "/",
+    setCookie(c, "access_token", token, {
       httpOnly: true,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
-      expires: new Date(Date.now() + 60 * 60 * 1000), // 1 hora
+      secure: true,
+      sameSite: "Strict",
     });
-
-    console.log("Cookie set");
 
     return c.json({ message: "Usuario logado!", token }, 200);
   } catch (err) {

@@ -44,6 +44,7 @@ model Medicaments {
   id        Int     @id @default(autoincrement())
   nome      String
   descricao String
+  horario   String
   dosagem   String
   intervalo String
   Pacient   Pacient @relation(fields: [pacientId], references: [id])

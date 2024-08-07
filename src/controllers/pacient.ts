@@ -138,11 +138,18 @@ export const deletePacient = async (c: Context) => {
       return c.json({ error: "Paciente nao encontrado" }, 404);
     }
 
-    await prisma.pacient.delete({
-      where: {
-        id: Number(id),
-      },
-    });
+    await prisma.$transaction([
+      prisma.medicaments.deleteMany({
+        where: {
+          pacientId: Number(id),
+        },
+      }),
+      prisma.pacient.delete({
+        where: {
+          id: Number(id),
+        },
+      }),
+    ]);
 
     return c.json({ message: "Paciente deletado !" }, 200);
   } catch (err) {

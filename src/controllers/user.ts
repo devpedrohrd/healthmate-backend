@@ -132,11 +132,17 @@ export const deleteUser = async (c: Context) => {
       return c.json({ error: "Usuario nao encontrado" }, 404);
     }
 
-    await prisma.user.delete({
-      where: {
-        id: Number(id),
-      },
-    });
+    await prisma.$transaction([
+      prisma.medicaments.deleteMany({
+        where: { pacientId: Number(id) },
+      }),
+      prisma.pacient.deleteMany({
+        where: { userId: Number(id) },
+      }),
+      prisma.user.delete({
+        where: { id: Number(id) },
+      }),
+    ]);
 
     return c.json({ message: "Usuario deletado !" }, 200);
   } catch (err) {
