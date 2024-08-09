@@ -1,12 +1,12 @@
+import { pacienteSchema } from "../schema/schemas";
 import { Context } from "hono";
 import { ZodError } from "zod";
 
 import { prisma } from "../config/Prisma";
-import { pacientSchema } from "../schema/pacient";
 
 export const getPacients = async (c: Context) => {
   try {
-    const pacients = await prisma.pacient.findMany();
+    const pacients = await prisma.paciente.findMany();
 
     if (pacients.length === 0) {
       return c.json({ error: "Nenhum paciente encontrado" }, 404);
@@ -24,38 +24,20 @@ export const getPacients = async (c: Context) => {
 export const createPacient = async (c: Context) => {
   try {
     const data = await c.req.json();
-    const parsedData = pacientSchema.parse(data);
+    const parsedData = pacienteSchema.parse(data);
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.paciente.findUnique({
       where: {
-        id: parsedData.usuarioId,
+        email: parsedData.email,
       },
     });
 
-    if (!user) {
-      return c.json({ error: "Usuario nao encontrado" }, 404);
+    if (user) {
+      return c.json({ error: "Usuario com este email já existe !" }, 404);
     }
 
-    const pacient = await prisma.pacient.findFirst({
-      where: {
-        userId: parsedData.usuarioId,
-      },
-    });
-
-    if (pacient) {
-      return c.json({ error: "Usuario ja cadastrado como paciente" }, 400);
-    }
-
-    await prisma.pacient.create({
-      data: {
-        dataNascimento: parsedData.dataNascimento,
-        endereco: parsedData.endereco,
-        peso: parsedData.peso,
-        altura: parsedData.altura,
-        pressao: parsedData.pressao,
-        observacoes: parsedData.observacoes,
-        userId: parsedData.usuarioId,
-      },
+    await prisma.paciente.create({
+      data: parsedData,
     });
 
     return c.json({ message: "Paciente criado com sucesso" }, 201);
@@ -70,7 +52,7 @@ export const createPacient = async (c: Context) => {
 export const getPacientById = async (c: Context) => {
   try {
     const { id } = c.req.param();
-    const pacient = await prisma.pacient.findUnique({
+    const pacient = await prisma.paciente.findUnique({
       where: {
         id: Number(id),
       },
@@ -90,61 +72,62 @@ export const updatePacient = async (c: Context) => {
   try {
     const { id } = c.req.param();
     const data = await c.req.json();
-    const parsedData = pacientSchema.parse(data);
 
-    const pacient = await prisma.pacient.findUnique({
+    const parsedData = pacienteSchema.parse(data);
+
+    console.log(parsedData);
+
+    const pacient = await prisma.paciente.findUnique({
       where: {
         id: Number(id),
       },
     });
 
     if (!pacient) {
-      return c.json({ error: "Paciente nao encontrado" }, 404);
+      return c.json({ error: "Paciente não encontrado" }, 404);
     }
 
-    const up = await prisma.pacient.update({
+    const updatedPacient = await prisma.paciente.update({
       where: {
         id: Number(id),
       },
-      data: {
-        dataNascimento: parsedData.dataNascimento,
-        endereco: parsedData.endereco,
-        peso: parsedData.peso,
-        altura: parsedData.altura,
-        pressao: parsedData.pressao,
-        observacoes: parsedData.observacoes,
-      },
+      data: parsedData,
     });
 
-    return c.json({ message: "Paciente atualizado !" }, 200);
+    return c.json(
+      { message: "Paciente atualizado com sucesso!", paciente: updatedPacient },
+      200
+    );
   } catch (err) {
     if (err instanceof ZodError) {
       return c.json({ error: err.errors }, 400);
     }
-    return c.json({ error: "Internal Server Error !" }, 500);
+
+    console.error("Erro interno:", err);
+    return c.json({ error: "Erro interno no servidor" }, 500);
   }
 };
 
 export const deletePacient = async (c: Context) => {
   try {
     const { id } = c.req.param();
-    const pacient = await prisma.pacient.findUnique({
+    const pacient = await prisma.paciente.findUnique({
       where: {
         id: Number(id),
       },
     });
 
     if (!pacient) {
-      return c.json({ error: "Paciente nao encontrado" }, 404);
+      return c.json({ error: "Paciente nâo encontrado" }, 404);
     }
 
     await prisma.$transaction([
-      prisma.medicaments.deleteMany({
+      prisma.medicamento.deleteMany({
         where: {
-          pacientId: Number(id),
+          pacienteId: Number(id),
         },
       }),
-      prisma.pacient.delete({
+      prisma.paciente.delete({
         where: {
           id: Number(id),
         },

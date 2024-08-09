@@ -1,7 +1,8 @@
+import { medicamentoSchema } from "../schema/schemas";
 import { Context } from "hono";
-import { medicamentoSchema } from "../schema/medicament";
-import { prisma } from "../config/Prisma";
 import { z } from "zod";
+
+import { prisma } from "../config/Prisma";
 
 export const createMedicament = async (c: Context) => {
   try {
@@ -9,29 +10,30 @@ export const createMedicament = async (c: Context) => {
 
     const parseData = medicamentoSchema.parse(body);
 
-    const pacient = await prisma.pacient.findUnique({
+    const pacient = await prisma.paciente.findUnique({
       where: {
-        id: parseData.pacientId,
+        id: parseData.pacienteId,
       },
     });
 
     if (!pacient) {
-      return c.json({ message: "Paciente nao encontrado" }, 404);
+      return c.json({ message: "Paciente não encontrado" }, 404);
     }
 
-    const medicament = await prisma.medicaments.findMany({
+    const medicament = await prisma.medicamento.findFirst({
       where: {
         ...parseData,
       },
     });
 
-    if (medicament.length > 0) {
-      return c.json({ message: "Medicamento ja cadastrado" }, 409);
+    if (medicament) {
+      return c.json({ message: "Medicamento já cadastrado" }, 409);
     }
 
-    await prisma.medicaments.create({
+    await prisma.medicamento.create({
       data: parseData,
     });
+
     return c.json({ message: "Medicamento cadastrado com sucesso" }, 201);
   } catch (err) {
     if (err instanceof z.ZodError) {
@@ -43,7 +45,7 @@ export const createMedicament = async (c: Context) => {
 
 export const getMedicaments = async (c: Context) => {
   try {
-    const medicaments = await prisma.medicaments.findMany();
+    const medicaments = await prisma.medicamento.findMany();
 
     if (medicaments.length === 0) {
       return c.json({ message: "Nenhum medicamento cadastrado" }, 404);
@@ -58,7 +60,7 @@ export const getMedicaments = async (c: Context) => {
 export const getMedicamentById = async (c: Context) => {
   try {
     const { id } = c.req.param();
-    const medicament = await prisma.medicaments.findUnique({
+    const medicament = await prisma.medicamento.findUnique({
       where: {
         id: parseInt(id),
       },
@@ -84,7 +86,7 @@ export const updateMedicament = async (c: Context) => {
 
     const parseData = medicamentoSchema.parse(body);
 
-    const medicament = await prisma.medicaments.findUnique({
+    const medicament = await prisma.medicamento.findUnique({
       where: {
         id: parseInt(id),
       },
@@ -94,7 +96,7 @@ export const updateMedicament = async (c: Context) => {
       return c.json({ message: "Medicamento nao encontrado" }, 404);
     }
 
-    await prisma.medicaments.update({
+    await prisma.medicamento.update({
       where: {
         id: parseInt(id),
       },
@@ -114,7 +116,7 @@ export const deleteMedicament = async (c: Context) => {
   try {
     const { id } = c.req.param();
 
-    const medicament = await prisma.medicaments.findUnique({
+    const medicament = await prisma.medicamento.findUnique({
       where: {
         id: parseInt(id),
       },
@@ -124,7 +126,7 @@ export const deleteMedicament = async (c: Context) => {
       return c.json({ message: "Medicamento nao encontrado" }, 404);
     }
 
-    await prisma.medicaments.delete({
+    await prisma.medicamento.delete({
       where: {
         id: parseInt(id),
       },
