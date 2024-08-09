@@ -2,8 +2,7 @@
   "name": "@healthmate/backend",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "start": "bun run start",
-    "test": "cypress run"
+    "start": "bun run src/index.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.12.0",
@@ -14,7 +13,6 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
     "@types/bun": "^1.1.6",
     "cypress": "^13.13.2",
     "prisma": "^5.17.0"

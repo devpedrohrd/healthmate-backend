@@ -4,7 +4,7 @@ import { sign } from "hono/jwt";
 import { ZodError } from "zod";
 
 import { prisma } from "../config/Prisma";
-import { loginSchema } from "../schema/login";
+import { loginSchema } from "../schema/schemas";
 
 const JWT_SECRET = Bun.env.JWT_SECRET || "your_jwt_secret";
 
@@ -18,7 +18,7 @@ export const login = async (c: Context) => {
 
     const parseData = loginSchema.parse(body);
 
-    const user = await prisma.user.findFirst({
+    const user = await prisma.profissionalSaude.findFirst({
       where: { email: parseData.email },
     });
 
@@ -39,10 +39,11 @@ export const login = async (c: Context) => {
 
     setCookie(c, "access_token", token, {
       httpOnly: true,
-      secure: true,
+      secure: false,
       sameSite: "Strict",
+      path: "/",
+      expires: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24 horas
     });
-
     return c.json({ message: "Usuario logado!", token }, 200);
   } catch (err) {
     if (err instanceof ZodError) {

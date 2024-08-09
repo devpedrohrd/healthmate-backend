@@ -3,35 +3,35 @@
   "info": {
     "title": "API do HealthMate",
     "version": "1.0.0",
-    "description": "API para gerenciamento do no projeto de aplicação web"
+    "description": "API para gerenciamento no projeto de aplicação web"
   },
   "tags": [
     {
-      "name": "User",
-      "description": "Operações relacionadas a usuários"
+      "name": "Profissional",
+      "description": "Operações relacionadas a profissionais de saúde"
     }
   ],
   "paths": {
-    "/api/users": {
+    "/api/profissional": {
       "post": {
-        "tags": ["User"],
-        "summary": "Adiciona um novo usuário",
+        "tags": ["Profissional"],
+        "summary": "Adiciona um novo profissional",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/User"
+                "$ref": "#/components/schemas/Profissional"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Usuário criado com sucesso"
+            "description": "Profissional criado com sucesso"
           },
           "400": {
-            "description": "Erro de validação ou usuário já existe"
+            "description": "Erro de validação ou profissional já existe"
           },
           "500": {
             "description": "Erro interno do servidor"
@@ -39,24 +39,24 @@
         }
       },
       "get": {
-        "tags": ["User"],
-        "summary": "Retorna uma lista de todos os usuários",
+        "tags": ["Profissional"],
+        "summary": "Retorna uma lista de todos os profissionais",
         "responses": {
           "200": {
-            "description": "Lista de usuários retornada com sucesso",
+            "description": "Lista de profissionais retornada com sucesso",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/Profissional"
                   }
                 }
               }
             }
           },
           "404": {
-            "description": "Nenhum usuário encontrado"
+            "description": "Nenhum profissional encontrado"
           },
           "500": {
             "description": "Erro interno do servidor"
@@ -64,10 +64,10 @@
         }
       }
     },
-    "/api/users/{id}": {
+    "/api/profissional/{id}": {
       "get": {
-        "tags": ["User"],
-        "summary": "Retorna um usuário específico",
+        "tags": ["Profissional"],
+        "summary": "Retorna um profissional específico",
         "parameters": [
           {
             "name": "id",
@@ -80,17 +80,17 @@
         ],
         "responses": {
           "200": {
-            "description": "Usuário retornado com sucesso",
+            "description": "Profissional retornado com sucesso",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/Profissional"
                 }
               }
             }
           },
           "404": {
-            "description": "Usuário não encontrado"
+            "description": "Profissional não encontrado"
           },
           "500": {
             "description": "Erro interno do servidor"
@@ -98,8 +98,8 @@
         }
       },
       "put": {
-        "tags": ["User"],
-        "summary": "Atualiza as informações de um usuário",
+        "tags": ["Profissional"],
+        "summary": "Atualiza as informações de um profissional",
         "parameters": [
           {
             "name": "id",
@@ -115,20 +115,20 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/User"
+                "$ref": "#/components/schemas/Profissional"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Usuário atualizado com sucesso"
+            "description": "Profissional atualizado com sucesso"
           },
           "400": {
             "description": "Erro de validação"
           },
           "404": {
-            "description": "Usuário não encontrado"
+            "description": "Profissional não encontrado"
           },
           "500": {
             "description": "Erro interno do servidor"
@@ -136,8 +136,8 @@
         }
       },
       "delete": {
-        "tags": ["User"],
-        "summary": "Remove um usuário",
+        "tags": ["Profissional"],
+        "summary": "Remove um profissional",
         "parameters": [
           {
             "name": "id",
@@ -150,10 +150,10 @@
         ],
         "responses": {
           "200": {
-            "description": "Usuário deletado com sucesso"
+            "description": "Profissional deletado com sucesso"
           },
           "404": {
-            "description": "Usuário não encontrado"
+            "description": "Profissional não encontrado"
           },
           "500": {
             "description": "Erro interno do servidor"
@@ -164,7 +164,7 @@
   },
   "components": {
     "schemas": {
-      "User": {
+      "Profissional": {
         "type": "object",
         "properties": {
           "id": {
@@ -187,9 +187,9 @@
             "type": "string",
             "example": "123456789"
           },
-          "Tipo": {
+          "especialidade": {
             "type": "string",
-            "example": "admin"
+            "example": "Cardiologia"
           }
         },
         "required": ["nome", "email", "senha"]

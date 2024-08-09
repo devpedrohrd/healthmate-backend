@@ -9,18 +9,21 @@ import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 
 import swagger from "../swagger.json";
+import { lembreteRoutes } from "./routes/lembrete";
 import { loginRoutes } from "./routes/login";
 import { medicamentRoutes } from "./routes/medicament";
 import { pacientRoutes } from "./routes/pacient";
-import { userRoutes } from "./routes/user";
-
-// Import the swagger.json file
+import { profissionalRoutes } from "./routes/profissional";
 
 const app = new Hono();
 
-// Middlewares
 app.use(logger());
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://127.0.0.1:5500",
+    credentials: true,
+  })
+);
 app.use(csrf());
 app.use(secureHeaders());
 
@@ -31,18 +34,17 @@ app
   .get("/set-cookie", async (c) => {
     setCookie(c, "token", "cookie", {
       httpOnly: true,
-      secure: true,
+      secure: false,
       sameSite: "Strict",
     });
     return c.text("Cookie set successfully!");
   });
 
 app.route("/api/login", loginRoutes);
-app.route("/api/users", userRoutes);
-app.route("/api/pacients", pacientRoutes);
-app.route("/api/medicaments", medicamentRoutes);
-
-// app.use("/api/users/*", bearerAuth({ token: Bun.env.JWT_SECRET as string }));
+app.route("/api/pacientes", pacientRoutes);
+app.route("/api/medicamentos", medicamentRoutes);
+app.route("api/profissional", profissionalRoutes);
+app.route("/api/lembretes", lembreteRoutes);
 
 app.get("/api/docs", swaggerUI({ url: "/api/swagger" }));
 app.get("/api/swagger", async (c) => {
