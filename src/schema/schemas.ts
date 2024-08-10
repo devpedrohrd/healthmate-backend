@@ -79,3 +79,18 @@ export const lembreteSchema = z.object({
   mensagem: z.string().nullable(),
   status: z.enum(["pendente", "concluido", "cancelado"]).default("pendente"),
 });
+
+export const avaliacaoSchema = z.object({
+  id: z.number().int().nonnegative().optional(),
+  pacienteId: z.number().int().positive(),
+  observacoes: z.string().max(500).nullable().optional(),
+  sintomas: z.string().max(500).nullable().optional(),
+  efeitosColaterais: z.string().max(500).nullable().optional(),
+});
+
+export const relatorioSchema = z.object({
+  id: z.number().int().nonnegative().optional(),
+  pacienteId: z.number().int().positive(),
+  profissionalSaudeId: z.number().int().positive(),
+  conteudoRelatorio: z.string().max(500).nullable().optional(),
+});
