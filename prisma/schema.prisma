@@ -13,8 +13,10 @@ model ProfissionalSaude {
   email         String      @unique @db.VarChar(100)
   senha         String      @db.VarChar(255)
   especialidade String?     @db.VarChar(100)
+  foto_perfil   String?     @db.VarChar(255)
+  googleId      String?     @db.VarChar(255)
+  createdAt     String?     @db.VarChar(255)
   Pacientes     Paciente[]
-  LinkUnico     LinkUnico[]
   Relatorio     Relatorio[]
 }
 
@@ -24,6 +26,8 @@ model Paciente {
   email          String              @unique @db.VarChar(100)
   telefone       String?             @db.VarChar(15)
   endereco       Json                @db.Json
+  senha          String?             @db.VarChar(255)
+  foto_perfil    String?             @db.VarChar(255)
   Profissional   ProfissionalSaude[]
   Medicamento    Medicamento[]
   AvaliacaoSaude AvaliacaoSaude[]
@@ -67,13 +71,5 @@ model Relatorio {
   profissionalSaudeId Int               @map("profissional_saude_id")
   conteudoRelatorio   String?           @map("conteudo_relatorio")
   paciente            Paciente          @relation(fields: [pacienteId], references: [id])
-  profissionalSaude   ProfissionalSaude @relation(fields: [profissionalSaudeId], references: [id])
-}
-
-model LinkUnico {
-  id                  Int               @id @default(autoincrement())
-  profissionalSaudeId Int               @map("profissional_saude_id")
-  link                String            @db.VarChar(255)
-  status              String            @default("ativo") @db.VarChar(20)
   profissionalSaude   ProfissionalSaude @relation(fields: [profissionalSaudeId], references: [id])
 }
