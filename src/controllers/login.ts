@@ -12,7 +12,7 @@ const createToken = async (payload: any) => {
   return sign(payload, JWT_SECRET, "HS256");
 };
 
-export const login = async (c: Context) => {
+export const loginProfissional = async (c: Context) => {
   try {
     const body = await c.req.json();
 
@@ -39,7 +39,7 @@ export const login = async (c: Context) => {
 
     setCookie(c, "access_token", token, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: "Strict",
       path: "/",
       expires: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24 horas

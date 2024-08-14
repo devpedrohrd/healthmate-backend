@@ -1,8 +1,9 @@
-import { login } from "../controllers/login";
 import { Hono } from "hono";
+
+import { loginProfissional } from "../controllers/login";
 
 const loginRoutes = new Hono();
 
-loginRoutes.post("/", (c) => login(c));
+loginRoutes.post("/", (c) => loginProfissional(c));
 
 export { loginRoutes };
