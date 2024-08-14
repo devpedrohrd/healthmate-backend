@@ -14,6 +14,7 @@ export const profissionalSchema = z.object({
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
       "Senha invalida"
     ),
+  foto_perfil: z.string().nullable().optional(),
   especialidade: z.string().max(100).nullable().optional(),
   id: z.number().int().optional(),
 });
@@ -37,6 +38,8 @@ export const pacienteSchema = z.object({
   id: z.number().int().positive().optional(),
   nome: z.string().regex(/^[\p{L}\s.]+$/u, "Nome invalido"),
   email: z.string().email().max(100),
+  senha: z.string().max(11),
+  foto_perfil: z.string().nullable().optional(),
   telefone: z
     .string()
     .max(15)
@@ -66,7 +69,10 @@ export const loginSchema = z.object({
   senha: z
     .string()
     .min(6, "Senha deve ter no minimo 6 caracteres")
-    .regex(/^[a-zA-Z0-9]+$/, "Senha invalida"),
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+      "Senha invalida"
+    ),
 });
 
 export const lembreteSchema = z.object({
