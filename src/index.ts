@@ -21,7 +21,7 @@ app.use(logger());
 app.use(
   "*",
   cors({
-    origin: Bun.env.ORIGIN as string,
+    origin: "https://healthmate-backend-8vik.onrender.com" as string,
     credentials: true,
     allowHeaders: ["Content-Type", "Authorization"],
     allowMethods: ["GET", "POST", "PUT", "DELETE"],
