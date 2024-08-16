@@ -2,7 +2,7 @@ import { Context } from "hono";
 import { z } from "zod";
 
 import { prisma } from "../config/Prisma";
-import { idSchema, profissionalSchema } from "../schema/schemas";
+import { emailSchema, idSchema, profissionalSchema } from "../schema/schemas";
 
 export const createProfissional = async (c: Context) => {
   try {
@@ -20,7 +20,11 @@ export const createProfissional = async (c: Context) => {
     }
 
     const profCreate = await prisma.profissionalSaude.create({
-      data: { ...parseData, senha: await Bun.password.hash(parseData.senha) },
+      data: {
+        ...parseData,
+        senha: await Bun.password.hash(parseData.senha ?? ""),
+        createdAt: new Date().toLocaleString(),
+      },
     });
 
     if (!profCreate) {
@@ -45,6 +49,7 @@ export const getProfissionals = async (c: Context) => {
         nome: true,
         email: true,
         especialidade: true,
+        createdAt: true,
       },
     });
 
@@ -76,6 +81,7 @@ export const getProfissional = async (c: Context) => {
         nome: true,
         email: true,
         especialidade: true,
+        createdAt: true,
       },
     });
 
@@ -150,7 +156,10 @@ export const updateProfissional = async (c: Context) => {
       where: {
         id: parseId.id,
       },
-      data: { ...parseData, senha: await Bun.password.hash(parseData.senha) },
+      data: {
+        ...parseData,
+        senha: await Bun.password.hash(parseData.senha ?? ""),
+      },
     });
 
     if (!profissional) {
@@ -163,6 +172,87 @@ export const updateProfissional = async (c: Context) => {
       return c.json({ message: e.errors }, 400);
     }
 
+    return c.json({ message: "Erro interno" }, 500);
+  }
+};
+
+export const getProfissionalByEmail = async (c: Context) => {
+  try {
+    const { email } = await c.req.json();
+
+    const parseEmail = emailSchema.parse({ email });
+
+    const profissional = await prisma.profissionalSaude.findUnique({
+      where: {
+        email: parseEmail.email,
+      },
+    });
+
+    if (!profissional) {
+      return c.json({ message: "Profissional não encontrado" }, 404);
+    }
+
+    return c.json(profissional, 200);
+  } catch (e) {
+    return c.json({ message: "Erro interno" }, 500);
+  }
+};
+
+export const getProfissionalByNome = async (c: Context) => {
+  try {
+    const { nome } = await c.req.json();
+
+    const profissional = await prisma.profissionalSaude.findMany({
+      where: {
+        nome: {
+          contains: nome,
+        },
+      },
+    });
+
+    if (!profissional) {
+      return c.json({ message: "Profissional não encontrado" }, 404);
+    }
+
+    return c.json(profissional, 200);
+  } catch (e) {
+    return c.json({ message: "Erro interno" }, 500);
+  }
+};
+
+export const getProfissionalByData = async (c: Context) => {
+  try {
+    const { data } = await c.req.json();
+
+    const dataInicio = `${data}, 00:00:00`;
+    const dataFim = `${data}, 23:59:59`;
+
+    console.log("Data Início:", dataInicio);
+    console.log("Data Fim:", dataFim);
+
+    const profissional = await prisma.profissionalSaude.findMany({
+      where: {
+        createdAt: {
+          gte: dataInicio,
+          lte: dataFim,
+        },
+      },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        especialidade: true,
+        createdAt: true,
+      },
+    });
+
+    if (!profissional || profissional.length === 0) {
+      return c.json({ message: "Profissional não encontrado" }, 404);
+    }
+
+    return c.json(profissional, 200);
+  } catch (e) {
+    console.error("Erro:", e);
     return c.json({ message: "Erro interno" }, 500);
   }
 };
