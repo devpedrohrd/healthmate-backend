@@ -10,7 +10,6 @@ import swagger from "../swagger.json";
 import { avaliacaoRoutes } from "./routes/avaliacao";
 import { lembreteRoutes } from "./routes/lembrete";
 import { loginRoutes } from "./routes/login";
-import { routeLoginGoogle } from "./routes/loginGoogle";
 import { medicamentRoutes } from "./routes/medicament";
 import { pacientRoutes } from "./routes/pacient";
 import { profissionalRoutes } from "./routes/profissional";
@@ -31,13 +30,13 @@ app.use(
 app.use(csrf());
 app.use(secureHeaders());
 
-// app.route("/login", loginRoutes);
+app.route("/login", loginRoutes);
+app.route("/google", loginRoutes);
 app.route("/pacientes", pacientRoutes);
 app.route("/medicamentos", medicamentRoutes);
 app.route("/profissional", profissionalRoutes);
 app.route("/lembretes", lembreteRoutes);
 app.route("/avaliacao", avaliacaoRoutes);
-app.route("/", routeLoginGoogle);
 app.route("/relatorio", relatorioRoutes);
 
 app.get("/docs", swaggerUI({ url: "/swagger" }));

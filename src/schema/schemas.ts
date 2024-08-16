@@ -10,12 +10,11 @@ export const profissionalSchema = z.object({
   senha: z
     .string()
     .min(6, "Senha deve ter no minimo 6 caracteres")
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
-      "Senha invalida"
-    ),
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/, "Senha invalida")
+    .optional(),
   foto_perfil: z.string().nullable().optional(),
   especialidade: z.string().max(100).nullable().optional(),
+  googleId: z.string().max(100).nullable().optional(),
   id: z.number().int().optional(),
 });
 
@@ -99,4 +98,8 @@ export const relatorioSchema = z.object({
   pacienteId: z.number().int().positive(),
   profissionalSaudeId: z.number().int().positive(),
   conteudoRelatorio: z.string().max(500).nullable().optional(),
+});
+
+export const emailSchema = z.object({
+  email: z.string().email("Formato de email inválido"),
 });
