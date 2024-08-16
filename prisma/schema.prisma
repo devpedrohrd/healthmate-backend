@@ -28,6 +28,7 @@ model Paciente {
   endereco       Json                @db.Json
   senha          String?             @db.VarChar(255)
   foto_perfil    String?             @db.VarChar(255)
+  createdAt      String?             @db.VarChar(255)
   Profissional   ProfissionalSaude[]
   Medicamento    Medicamento[]
   AvaliacaoSaude AvaliacaoSaude[]
