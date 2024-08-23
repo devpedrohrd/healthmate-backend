@@ -1,3 +1,6 @@
+import { Hono } from "hono";
+import { jwt } from "hono/jwt";
+
 import {
   createAvaliacao,
   deleteAvaliacao,
@@ -5,10 +8,11 @@ import {
   getAvaliacaoById,
   updateAvaliacao,
 } from "../controllers/avaliacao";
-import { Hono } from "hono";
+import { verifyToken } from "./verifyToken";
 
 export const avaliacaoRoutes = new Hono();
 
+avaliacaoRoutes.use("*", verifyToken);
 avaliacaoRoutes.post("/", (c) => createAvaliacao(c));
 avaliacaoRoutes.get("/", (c) => getAvaliacao(c));
 avaliacaoRoutes.delete("/:id", (c) => deleteAvaliacao(c));

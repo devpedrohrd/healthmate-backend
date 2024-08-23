@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { jwt } from "hono/jwt";
 
 import {
   createRelatorio,
@@ -7,9 +8,11 @@ import {
   getRelatorios,
   updateRelatorio,
 } from "../controllers/relatorio";
+import { verifyToken } from "./verifyToken";
 
 export const relatorioRoutes = new Hono();
 
+relatorioRoutes.use("*", verifyToken);
 relatorioRoutes.post("/", (c) => createRelatorio(c));
 relatorioRoutes.get("/", (c) => getRelatorios(c));
 relatorioRoutes.get("/:id", (c) => getRelatorioById(c));
