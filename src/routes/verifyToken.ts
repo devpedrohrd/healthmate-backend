@@ -28,12 +28,10 @@ export const verifyToken = async (c: Context, next: Next) => {
   } catch (error) {
     console.error(error);
 
-    // Verifica se o erro está relacionado à assinatura do token
     if ((error as Error).name === "JwtTokenSignatureMismatched") {
       return c.json({ error: "Unauthorized: Token signature mismatched" }, 401);
     }
 
-    // Para outros erros de token, também retorna 401
     return c.json({ error: "Unauthorized" }, 401);
   }
 };

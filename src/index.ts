@@ -21,7 +21,7 @@ app.use(logger());
 app.use(
   "*",
   cors({
-    origin: "https://healthmate-backend-8vik.onrender.com" as string,
+    origin: "http://localhost:3000",
     credentials: true,
     allowHeaders: ["Content-Type", "Authorization"],
     allowMethods: ["GET", "POST", "PUT", "DELETE"],
@@ -44,7 +44,7 @@ app.get("/swagger", async (c) => {
   return c.json(swagger);
 });
 
-const port = parseInt(Bun.env.PORT as string, 10) || 3000;
+const port = parseInt(Bun.env.PORT as string, 10) || 3333;
 
 serve({
   fetch: app.fetch,
