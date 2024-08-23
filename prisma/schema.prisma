@@ -18,6 +18,8 @@ model ProfissionalSaude {
   createdAt     String?     @db.VarChar(255)
   Pacientes     Paciente[]
   Relatorio     Relatorio[]
+
+  @@index([googleId, id], name: "googleId")
 }
 
 model Paciente {
@@ -29,10 +31,13 @@ model Paciente {
   senha          String?             @db.VarChar(255)
   foto_perfil    String?             @db.VarChar(255)
   createdAt      String?             @db.VarChar(255)
+  googleId       String?             @db.VarChar(255)
   Profissional   ProfissionalSaude[]
   Medicamento    Medicamento[]
   AvaliacaoSaude AvaliacaoSaude[]
   Relatorio      Relatorio[]
+
+  @@index([googleId, id], name: "googleIdPaciente")
 }
 
 model Medicamento {
@@ -43,8 +48,11 @@ model Medicamento {
   dosagem    String?    @db.VarChar(50)
   horario    String?    @db.VarChar(50)
   quantidade Int        @default(0)
+  createdAt  String?    @db.VarChar(255)
   paciente   Paciente   @relation(fields: [pacienteId], references: [id])
   Lembrete   Lembrete[]
+
+  @@index([pacienteId, id], name: "medicamentoIdPaciente")
 }
 
 model Lembrete {
@@ -53,8 +61,11 @@ model Lembrete {
   horaLembrete  String?     @map("hora_lembrete")
   titulo        String?     @db.VarChar(100)
   mensagem      String?     @db.VarChar(255)
+  createdAt     String?     @db.VarChar(255)
   status        String      @default("pendente") @db.VarChar(20)
   medicamento   Medicamento @relation(fields: [medicamentoId], references: [id])
+
+  @@index([medicamentoId, id], name: "lembreteIdMedicamento")
 }
 
 model AvaliacaoSaude {
@@ -63,7 +74,10 @@ model AvaliacaoSaude {
   sintomas          String?
   efeitosColaterais String?  @map("efeitos_colaterais")
   observacoes       String?
+  createdAt         String?  @db.VarChar(255)
   paciente          Paciente @relation(fields: [pacienteId], references: [id])
+
+  @@index([pacienteId, id], name: "avalicaoIdPaciente")
 }
 
 model Relatorio {
@@ -71,6 +85,9 @@ model Relatorio {
   pacienteId          Int               @map("paciente_id")
   profissionalSaudeId Int               @map("profissional_saude_id")
   conteudoRelatorio   String?           @map("conteudo_relatorio")
+  createdAt           String?           @db.VarChar(255)
   paciente            Paciente          @relation(fields: [pacienteId], references: [id])
   profissionalSaude   ProfissionalSaude @relation(fields: [profissionalSaudeId], references: [id])
+
+  @@index([pacienteId, id], name: "pacienteIdRelatorio")
 }
