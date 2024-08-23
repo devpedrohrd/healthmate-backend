@@ -1,12 +1,22 @@
 import { Context } from "hono";
 import { ZodError } from "zod";
+import bcryrpt from "bcryptjs";
 
 import { prisma } from "../config/Prisma";
 import { pacienteSchema } from "../schema/schemas";
 
 export const getPacients = async (c: Context) => {
   try {
-    const pacients = await prisma.paciente.findMany();
+    const pacients = await prisma.paciente.findMany({
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        telefone: true,
+        createdAt: true,
+        endereco: true,
+      },
+    });
 
     if (pacients.length === 0) {
       return c.json({ error: "Nenhum paciente encontrado" }, 404);
@@ -37,7 +47,11 @@ export const createPacient = async (c: Context) => {
     }
 
     await prisma.paciente.create({
-      data: { ...parsedData, createdAt: new Date().toLocaleString() },
+      data: {
+        ...parsedData,
+        createdAt: new Date().toLocaleString(),
+        senha: await bcryrpt.hash(parsedData.senha ?? "", 10),
+      },
     });
 
     return c.json({ message: "Paciente criado com sucesso" }, 201);
@@ -55,6 +69,14 @@ export const getPacientById = async (c: Context) => {
     const pacient = await prisma.paciente.findUnique({
       where: {
         id: Number(id),
+      },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        telefone: true,
+        endereco: true,
+        createdAt: true,
       },
     });
 
@@ -87,7 +109,7 @@ export const updatePacient = async (c: Context) => {
       return c.json({ error: "Paciente não encontrado" }, 404);
     }
 
-    const updatedPacient = await prisma.paciente.update({
+    const { senha, ...updatedPacient } = await prisma.paciente.update({
       where: {
         id: Number(id),
       },
@@ -175,6 +197,14 @@ export const getPacientByEmail = async (c: Context) => {
       where: {
         email: body.email,
       },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        telefone: true,
+        endereco: true,
+        createdAt: true,
+      },
     });
 
     if (!pacient) {
@@ -196,6 +226,14 @@ export const getPacientByName = async (c: Context) => {
         nome: {
           contains: nome,
         },
+      },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        telefone: true,
+        endereco: true,
+        createdAt: true,
       },
     });
 
@@ -219,7 +257,7 @@ export const getpacientByData = async (c: Context) => {
     console.log("Data Início:", dataInicio);
     console.log("Data Fim:", dataFim);
 
-    const profissional = await prisma.paciente.findMany({
+    const pacientes = await prisma.paciente.findMany({
       where: {
         createdAt: {
           gte: dataInicio,
@@ -235,11 +273,44 @@ export const getpacientByData = async (c: Context) => {
       },
     });
 
-    if (!profissional || profissional.length === 0) {
-      return c.json({ message: "Profissional não encontrado" }, 404);
+    if (!pacientes || pacientes.length === 0) {
+      return c.json({ message: "pacientes não encontrado" }, 404);
     }
 
-    return c.json(profissional, 200);
+    return c.json(pacientes, 200);
+  } catch (e) {
+    console.error("Erro:", e);
+    return c.json({ message: "Erro interno" }, 500);
+  }
+};
+
+export const getPacienteByProfissionalId = async (c: Context) => {
+  try {
+    const { id } = c.req.param();
+
+    const pacientes = await prisma.paciente.findMany({
+      where: {
+        Profissional: {
+          some: {
+            id: Number(id),
+          },
+        },
+      },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        telefone: true,
+        endereco: true,
+        createdAt: true,
+      },
+    });
+
+    if (!pacientes || pacientes.length === 0) {
+      return c.json({ message: "Pacientes não encontrado" }, 404);
+    }
+
+    return c.json(pacientes, 200);
   } catch (e) {
     console.error("Erro:", e);
     return c.json({ message: "Erro interno" }, 500);

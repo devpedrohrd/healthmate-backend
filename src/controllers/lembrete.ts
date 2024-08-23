@@ -22,13 +22,10 @@ export const createLembrete = async (c: Context) => {
     }
 
     const novoLembrete = await prisma.lembrete.create({
-      data: parseData,
+      data: { createdAt: new Date().toLocaleString(), ...parseData },
     });
 
-    return c.json(
-      { message: "Lembrete cadastrado com sucesso!", lembrete: novoLembrete },
-      201
-    );
+    return c.json({ message: "Lembrete cadastrado com sucesso!" }, 201);
   } catch (e) {
     if (e instanceof ZodError) {
       console.error("Erro de validação com Zod:", e.errors);
@@ -138,5 +135,65 @@ export const updateLembrete = async (c: Context) => {
     }
 
     return c.json({ error: "Internal server error!" }, 500);
+  }
+};
+
+export const getLembretesIdMedicamento = async (c: Context) => {
+  try {
+    const { id } = c.req.param();
+
+    const lembretes = await prisma.lembrete.findMany({
+      where: {
+        medicamentoId: Number(id),
+      },
+    });
+
+    if (lembretes.length === 0) {
+      return c.json({ message: "Nenhum lembrete encontrado!" }, 404);
+    }
+
+    return c.json(lembretes, 200);
+  } catch (error) {
+    return c.json({ error: "Internal Server Error" }, 500);
+  }
+};
+
+export const getLembreteByTitulo = async (c: Context) => {
+  try {
+    const { titulo } = c.req.query();
+
+    const lembrete = await prisma.lembrete.findFirst({
+      where: {
+        titulo,
+      },
+    });
+
+    if (!lembrete) {
+      return c.json({ message: "Lembrete não encontrado" }, 404);
+    }
+
+    return c.json(lembrete);
+  } catch (error) {
+    return c.json({ message: "Erro ao buscar lembrete" }, 500);
+  }
+};
+
+export const getStatusLembrete = async (c: Context) => {
+  try {
+    const { status } = c.req.query();
+
+    const lembretes = await prisma.lembrete.findMany({
+      where: {
+        status,
+      },
+    });
+
+    if (lembretes.length === 0) {
+      return c.json({ message: "Nenhum lembrete encontrado" }, 404);
+    }
+
+    return c.json(lembretes);
+  } catch (error) {
+    return c.json({ message: "Erro ao buscar status do lembrete" }, 500);
   }
 };

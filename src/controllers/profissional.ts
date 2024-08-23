@@ -53,7 +53,7 @@ export const getProfissionals = async (c: Context) => {
       },
     });
 
-    if (!profissionals) {
+    if (profissionals.length === 0) {
       return c.json({ message: "Nenhum profissional encontrado" }, 404);
     }
 
@@ -186,6 +186,13 @@ export const getProfissionalByEmail = async (c: Context) => {
       where: {
         email: parseEmail.email,
       },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        especialidade: true,
+        createdAt: true,
+      },
     });
 
     if (!profissional) {
@@ -207,6 +214,13 @@ export const getProfissionalByNome = async (c: Context) => {
         nome: {
           contains: nome,
         },
+      },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        especialidade: true,
+        createdAt: true,
       },
     });
 

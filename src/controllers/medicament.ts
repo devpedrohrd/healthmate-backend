@@ -1,8 +1,8 @@
-import { medicamentoSchema } from "../schema/schemas";
 import { Context } from "hono";
 import { z } from "zod";
 
 import { prisma } from "../config/Prisma";
+import { medicamentoSchema } from "../schema/schemas";
 
 export const createMedicament = async (c: Context) => {
   try {
@@ -31,7 +31,7 @@ export const createMedicament = async (c: Context) => {
     }
 
     await prisma.medicamento.create({
-      data: parseData,
+      data: { createdAt: new Date().toLocaleString(), ...parseData },
     });
 
     return c.json({ message: "Medicamento cadastrado com sucesso" }, 201);

@@ -1,10 +1,13 @@
-import { Context } from "hono";
-import { setCookie } from "hono/cookie";
+import bcrypt from "bcryptjs";
+import { OAuth2Client } from "google-auth-library";
+import { Context, Next } from "hono";
 import { sign } from "hono/jwt";
 import { ZodError } from "zod";
 
 import { prisma } from "../config/Prisma";
-import { loginSchema, profissionalSchema } from "../schema/schemas";
+import { loginSchema } from "../schema/schemas";
+
+const client = new OAuth2Client(Bun.env.GOOGLE_CLIENT_ID as string);
 
 const JWT_SECRET = Bun.env.JWT_SECRET || "your_jwt_secret";
 
@@ -32,20 +35,19 @@ export const loginProfissional = async (c: Context) => {
       return c.json({ error: "Senha invalida" }, 400);
     }
 
-    const token = await createToken({
+    const token = {
       id: user.id,
       email: user.email,
-    });
+    };
 
-    setCookie(c, "access_token", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "Strict",
-      path: "/",
-      expires: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24 horas
-    });
-    return c.json({ message: "Usuario logado!", token }, 200);
+    const access_token = await createToken(token);
+
+    // setar o token no cabeçalho da resposta
+    c.header("Authorization", `Bearer ${access_token}`);
+
+    return c.json({ access_token });
   } catch (err) {
+    console.error(err);
     if (err instanceof ZodError) {
       return c.json({ error: err.errors }, 400);
     }
@@ -55,38 +57,83 @@ export const loginProfissional = async (c: Context) => {
 
 export const loginGoogle = async (c: Context) => {
   try {
-    const body = await c.req.json();
+    const token =
+      c.req.header("Authorization")?.split(" ")[1] || (await c.req.json());
 
-    const parseData = profissionalSchema.parse(body);
+    if (!token) {
+      return c.json("Unauthorized", 401);
+    }
+
+    const ticket = await client.verifyIdToken({
+      idToken: token as string,
+      audience: Bun.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+
+    if (!payload) {
+      return c.json({ error: "Invalid token" }, 401);
+    }
 
     const user = await prisma.profissionalSaude.findFirst({
-      where: { email: parseData.email },
+      where: { email: payload.email },
     });
 
     if (user) {
-      return c.json({ error: "Profissional ja existe !" }, 404);
+      return c.json({ error: "Usuario ja cadastrado" }, 400);
     }
 
-    const createUser = await prisma.profissionalSaude.create({
+    await prisma.profissionalSaude.create({
       data: {
-        nome: parseData.nome,
-        email: parseData.email,
-        senha: parseData.senha as string,
-        foto_perfil: parseData.foto_perfil,
+        nome: payload.name as string,
+        email: payload.email as string,
+        senha: "",
+        especialidade: "",
+        foto_perfil: payload.picture,
+        googleId: payload.sub,
         createdAt: new Date().toLocaleString(),
-        googleId: parseData.googleId,
       },
     });
+  } catch (error) {
+    console.error(error);
 
-    if (!createUser) {
-      return c.json({ error: "Erro ao criar profissional" }, 400);
+    return c.json({ error: "Internal Server Error" }, 500);
+  }
+};
+
+export const loginPacliente = async (c: Context) => {
+  try {
+    const body = await c.req.json();
+
+    const parseData = loginSchema.parse(body);
+
+    const user = await prisma.paciente.findFirst({
+      where: { email: parseData.email },
+    });
+
+    if (!user) {
+      return c.json({ error: "Usuario nao encontrado" }, 404);
     }
 
-    return c.json({ message: "Profissional criado com sucesso!" }, 201);
+    const compareHash = await bcrypt.compare(parseData.senha, user.senha as string);
+
+    if (!compareHash) {
+      return c.json({ error: "Senha invalida" }, 400);
+    }
+
+    const token = {
+      id: user.id,
+      email: user.email,
+    };
+
+    const access_token = await createToken(token);
+
+    // setar o token no cabeçalho da resposta
+    c.header("Authorization", `Bearer ${access_token}`);
+
+    return c.json({ access_token });
   } catch (err) {
-    if (err instanceof ZodError) {
-      return c.json({ error: err.errors }, 400);
-    }
-    return c.json({ error: "Internal Server Error!" }, 500);
+    console.error();
+    throw err;
   }
 };
