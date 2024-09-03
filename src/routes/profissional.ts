@@ -1,6 +1,15 @@
 import { Hono } from "hono";
 
-import { createProfissional, deleteProfissional, getProfissional, getProfissionalByData, getProfissionalByEmail, getProfissionalByNome, getProfissionals, updateProfissional } from "../controllers/profissional";
+import {
+  createProfissional,
+  deleteProfissional,
+  getProfissional,
+  getProfissionalByData,
+  getProfissionalByEmail,
+  getProfissionalByNome,
+  getProfissionals,
+  updateProfissional,
+} from "../controllers/profissional";
 import { verifyToken } from "./verifyToken";
 
 export const profissionalRoutes = new Hono();

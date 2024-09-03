@@ -1,9 +1,8 @@
-import { Context } from "hono";
-import { ZodError } from "zod";
-import bcryrpt from "bcryptjs";
-
 import { prisma } from "../config/Prisma";
 import { pacienteSchema } from "../schema/schemas";
+import bcryrpt from "bcryptjs";
+import { Context } from "hono";
+import { ZodError } from "zod";
 
 export const getPacients = async (c: Context) => {
   try {
@@ -113,7 +112,10 @@ export const updatePacient = async (c: Context) => {
       where: {
         id: Number(id),
       },
-      data: parsedData,
+      data: {
+        ...parsedData,
+        senha: await bcryrpt.hash(parsedData.senha ?? "", 10),
+      },
     });
 
     return c.json(
@@ -149,6 +151,19 @@ export const deletePacient = async (c: Context) => {
           pacienteId: Number(id),
         },
       }),
+
+      prisma.avaliacaoSaude.deleteMany({
+        where: {
+          pacienteId: Number(id),
+        },
+      }),
+
+      prisma.relatorio.deleteMany({
+        where: {
+          pacienteId: Number(id),
+        },
+      }),
+
       prisma.paciente.delete({
         where: {
           id: Number(id),

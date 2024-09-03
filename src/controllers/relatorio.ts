@@ -10,8 +10,6 @@ export const createRelatorio = async (c: Context) => {
 
     const { id, ...parseData } = relatorioSchema.parse(body);
 
-    console.log("Parsed Data:", parseData);
-
     const relatorioExists = await prisma.relatorio.findFirst({
       where: {
         conteudoRelatorio: parseData.conteudoRelatorio,
@@ -25,6 +23,7 @@ export const createRelatorio = async (c: Context) => {
     const relatorio = await prisma.relatorio.create({
       data: {
         ...parseData,
+        createdAt: new Date().toLocaleString(),
       },
     });
 

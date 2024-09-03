@@ -114,21 +114,27 @@ export const deleteProfissional = async (c: Context) => {
       return c.json({ message: "Profissional não encontrado" }, 404);
     }
 
-    const profissional = await prisma.profissionalSaude.delete({
-      where: {
-        id: parseId.id,
-      },
-    });
+    await prisma.$transaction([
+      prisma.relatorio.deleteMany({
+        where: {
+          profissionalSaudeId: parseId.id,
+        },
+      }),
 
-    if (!profissional) {
-      return c.json({ message: "Profissional não encontrado" }, 404);
-    }
+      prisma.profissionalSaude.delete({
+        where: {
+          id: parseId.id,
+        },
+      }),
+    ]);
 
     return c.json({ message: "Profissional deletado com sucesso" }, 200);
   } catch (e) {
     if (e instanceof z.ZodError) {
       return c.json({ message: e.errors }, 400);
     }
+
+    console.error("Erro interno", e);
 
     return c.json({ message: "Erro interno" }, 500);
   }
