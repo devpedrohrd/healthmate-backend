@@ -32,12 +32,20 @@ model Paciente {
   foto_perfil    String?             @db.VarChar(255)
   createdAt      String?             @db.VarChar(255)
   googleId       String?             @db.VarChar(255)
+  dataNascimento String?             @db.VarChar(255)
+  sexo           sexo?
   Profissional   ProfissionalSaude[]
   Medicamento    Medicamento[]
   AvaliacaoSaude AvaliacaoSaude[]
   Relatorio      Relatorio[]
 
   @@index([googleId, id], name: "googleIdPaciente")
+}
+
+enum sexo {
+  masculino
+  feminino
+  outro
 }
 
 model Medicamento {
