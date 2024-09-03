@@ -17,7 +17,7 @@ import { verifyToken } from "./verifyToken";
 
 const pacientRoutes = new Hono();
 
-pacientRoutes.use("*", verifyToken);
+// pacientRoutes.use("*", verifyToken);
 pacientRoutes.get("/", (c) => getPacients(c));
 pacientRoutes.post("/", (c) => createPacient(c));
 pacientRoutes.get("/:id", (c) => getPacientById(c));

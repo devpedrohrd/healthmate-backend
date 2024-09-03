@@ -31,7 +31,6 @@ app.use(csrf());
 app.use(secureHeaders());
 
 app.route("/login", loginRoutes);
-app.route("/google", loginRoutes);
 app.route("/pacientes", pacientRoutes);
 app.route("/medicamentos", medicamentRoutes);
 app.route("/profissional", profissionalRoutes);

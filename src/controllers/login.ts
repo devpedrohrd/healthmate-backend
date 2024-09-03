@@ -80,7 +80,7 @@ export const loginGoogle = async (c: Context) => {
     });
 
     if (user) {
-      return c.json({ error: "Usuario ja cadastrado" }, 400);
+      return c.redirect("/dashboard");
     }
 
     await prisma.profissionalSaude.create({
@@ -115,7 +115,10 @@ export const loginPacliente = async (c: Context) => {
       return c.json({ error: "Usuario nao encontrado" }, 404);
     }
 
-    const compareHash = await bcrypt.compare(parseData.senha, user.senha as string);
+    const compareHash = await bcrypt.compare(
+      parseData.senha,
+      user.senha as string
+    );
 
     if (!compareHash) {
       return c.json({ error: "Senha invalida" }, 400);

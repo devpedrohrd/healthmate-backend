@@ -10,7 +10,7 @@ export const profissionalSchema = z.object({
   senha: z
     .string()
     .min(6, "Senha deve ter no minimo 6 caracteres")
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/, "Senha invalida")
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/, "Senha invalida") // exemplo de senha: Abc123@#
     .optional(),
   foto_perfil: z.string().nullable().optional(),
   especialidade: z.string().max(100).nullable().optional(),
@@ -44,6 +44,8 @@ export const pacienteSchema = z.object({
     .max(15)
     .regex(/^\d{2,3}\d{4,5}\d{4}$/),
   endereco: enderecoSchema,
+  dataNascimento: z.string().regex(/^\d{2}-\d{2}-\d{4}$/), // fromat: dd-mm-yyyy
+  sexo: z.enum(["masculino", "feminino", "outro"]),
 });
 
 export const medicamentoSchema = z.object({
