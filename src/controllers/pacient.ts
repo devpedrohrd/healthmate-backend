@@ -15,6 +15,7 @@ export const getPacients = async (c: Context) => {
         telefone: true,
         createdAt: true,
         endereco: true,
+        dataNascimento: true,
       },
     });
 
@@ -77,6 +78,7 @@ export const getPacientById = async (c: Context) => {
         telefone: true,
         endereco: true,
         createdAt: true,
+        dataNascimento: true,
       },
     });
 
