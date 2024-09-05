@@ -1,8 +1,9 @@
-import { prisma } from "../config/Prisma";
-import { pacienteSchema } from "../schema/schemas";
 import bcryrpt from "bcryptjs";
 import { Context } from "hono";
 import { ZodError } from "zod";
+
+import { prisma } from "../config/Prisma";
+import { pacienteSchema } from "../schema/schemas";
 
 export const getPacients = async (c: Context) => {
   try {

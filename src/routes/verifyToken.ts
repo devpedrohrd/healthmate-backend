@@ -5,7 +5,7 @@ import { verify } from "hono/jwt";
 const client = new OAuth2Client(Bun.env.GOOGLE_CLIENT_ID);
 const JWT_SECRET = Bun.env.JWT_SECRET as string;
 
-export const verifyToken = async (c: Context, next: Next) => {
+export const verifyToken = async (c: Context, next: Next, role?: string) => {
   try {
     const token = c.req.header("Authorization")?.split(" ")[1];
     if (!token) {
@@ -23,7 +23,11 @@ export const verifyToken = async (c: Context, next: Next) => {
       return c.json({ error: "Invalid token" }, 401);
     }
 
+    if (role && payload.role !== role) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
     c.set("user", payload);
+
     return next();
   } catch (error) {
     console.error(error);

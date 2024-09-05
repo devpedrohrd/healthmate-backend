@@ -1,5 +1,4 @@
-import { Hono } from "hono";
-import { jwt } from "hono/jwt";
+import { Context, Hono, Next } from "hono";
 
 import {
   createPacient,
@@ -17,16 +16,42 @@ import { verifyToken } from "./verifyToken";
 
 const pacientRoutes = new Hono();
 
-// pacientRoutes.use("*", verifyToken);
-pacientRoutes.get("/", (c) => getPacients(c));
-pacientRoutes.post("/", (c) => createPacient(c));
-pacientRoutes.get("/:id", (c) => getPacientById(c));
-pacientRoutes.put("/:id", (c) => updatePacient(c));
-pacientRoutes.delete("/:id", (c) => deletePacient(c));
-pacientRoutes.get("/:id/medicaments", (c) => getMedicamentsByPacient(c));
-pacientRoutes.post("/email", (c) => getPacientByEmail(c));
-pacientRoutes.post("/nome", (c) => getPacientByName(c));
-pacientRoutes.post("/data", (c) => getpacientByData(c));
-pacientRoutes.get("/:id/profissional", (c) => getPacienteByProfissionalId(c));
+const verify = async (c: Context, next: Next) => {
+  const user = c.get("user");
+  const idFromParams = c.req.param("id");
+
+  if (user.role === "profissional") {
+    return next();
+  }
+
+  if (user.role === "paciente") {
+    if (user.id !== Number(idFromParams)) {
+      return c.json(
+        { error: "Unauthorized: Acesso restrito para este usuario!" },
+        403
+      );
+    }
+    return next();
+  }
+
+  return c.json({ error: "Unauthorized: Invalid role" }, 403);
+};
+
+pacientRoutes.use("*", verifyToken);
+
+pacientRoutes.get("/", verify, (c) => getPacients(c));
+pacientRoutes.post("/", verify, (c) => createPacient(c));
+pacientRoutes.get("/:id", verify, (c) => getPacientById(c));
+pacientRoutes.put("/:id", verify, (c) => updatePacient(c));
+pacientRoutes.delete("/:id", verify, (c) => deletePacient(c));
+pacientRoutes.get("/:id/medicaments", verify, (c) =>
+  getMedicamentsByPacient(c)
+);
+pacientRoutes.post("/email", verify, (c) => getPacientByEmail(c));
+pacientRoutes.post("/nome", verify, (c) => getPacientByName(c));
+pacientRoutes.post("/data", verify, (c) => getpacientByData(c));
+pacientRoutes.get("/:id/profissional", verify, (c) =>
+  getPacienteByProfissionalId(c)
+);
 
 export { pacientRoutes };

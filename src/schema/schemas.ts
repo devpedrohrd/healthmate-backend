@@ -7,11 +7,7 @@ export const profissionalSchema = z.object({
     .trim()
     .min(1, "Email nao pode ser vazio")
     .email("Formato de email invalido"),
-  senha: z
-    .string()
-    .min(6, "Senha deve ter no minimo 6 caracteres")
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/, "Senha invalida") // exemplo de senha: Abc123@#
-    .optional(),
+  senha: z.string().min(6, "Senha deve ter no minimo 6 caracteres"),
   foto_perfil: z.string().nullable().optional(),
   especialidade: z.string().max(100).nullable().optional(),
   googleId: z.string().max(100).nullable().optional(),
@@ -26,11 +22,8 @@ const enderecoSchema = z.object({
   rua: z.string().max(255),
   numero: z.string().max(10),
   cidade: z.string().max(100),
-  estado: z.string().regex(/^[A-Z]{2}$/),
-  cep: z
-    .string()
-    .max(20)
-    .regex(/^\d{5}-\d{3}$/),
+  estado: z.string(),
+  cep: z.string().max(20),
 });
 
 export const pacienteSchema = z.object({
@@ -39,10 +32,6 @@ export const pacienteSchema = z.object({
   email: z.string().email().max(100),
   senha: z.string().max(11),
   foto_perfil: z.string().nullable().optional(),
-  telefone: z
-    .string()
-    .max(15)
-    .regex(/^\d{2,3}\d{4,5}\d{4}$/),
   endereco: enderecoSchema,
   dataNascimento: z.string().regex(/^\d{2}-\d{2}-\d{4}$/), // fromat: dd-mm-yyyy
   sexo: z.enum(["masculino", "feminino", "outro"]),
@@ -51,10 +40,7 @@ export const pacienteSchema = z.object({
 export const medicamentoSchema = z.object({
   id: z.number().int().positive().optional(),
   pacienteId: z.number().int().positive(),
-  nome: z
-    .string()
-    .max(100)
-    .regex(/^[\p{L}\s.]+$/u, "Nome invalido"),
+  nome: z.string().max(100),
   descricao: z.string().nullable().optional(),
   dosagem: z.string().max(50).nullable().optional(),
   horario: z.string().max(50).nullable().optional(),
@@ -67,21 +53,13 @@ export const loginSchema = z.object({
     .trim()
     .min(1, "Email nao pode ser vazio")
     .email("Formato de email invalido"),
-  senha: z
-    .string()
-    .min(6, "Senha deve ter no minimo 6 caracteres")
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
-      "Senha invalida"
-    ),
+  senha: z.string(),
 });
 
 export const lembreteSchema = z.object({
   id: z.number().int().nonnegative().optional(),
   medicamentoId: z.number().int().nonnegative(),
-  horaLembrete: z
-    .string()
-    .regex(/^\d{2}:\d{2}$/, "Formato de hora invalido(00:00)"),
+  horaLembrete: z.string(),
   titulo: z.string().max(100).nullable(),
   mensagem: z.string().nullable(),
   status: z.enum(["pendente", "concluido", "cancelado"]).default("pendente"),

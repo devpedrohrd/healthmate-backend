@@ -1,6 +1,6 @@
-import bcrypt from "bcryptjs";
+import { compare } from "bcryptjs";
 import { OAuth2Client } from "google-auth-library";
-import { Context, Next } from "hono";
+import { Context } from "hono";
 import { sign } from "hono/jwt";
 import { ZodError } from "zod";
 
@@ -15,39 +15,62 @@ const createToken = async (payload: any) => {
   return sign(payload, JWT_SECRET, "HS256");
 };
 
-export const loginProfissional = async (c: Context) => {
+export const login = async (c: Context) => {
   try {
     const body = await c.req.json();
 
     const parseData = loginSchema.parse(body);
 
-    const user = await prisma.profissionalSaude.findFirst({
-      where: { email: parseData.email },
-    });
+    const [profissionalSaude, paciente] = await Promise.all([
+      prisma.profissionalSaude
+        .findFirst({
+          where: { email: parseData.email },
+        })
+        .catch((err) => {
+          console.error("Error fetching profissionalSaude:", err);
+          return null;
+        }),
+      prisma.paciente
+        .findFirst({
+          where: { email: parseData.email },
+        })
+        .catch((err) => {
+          console.error("Error fetching paciente:", err);
+          return null;
+        }),
+    ]);
+    let user = null;
+    let role = null;
 
-    if (!user) {
-      return c.json({ error: "Usuario nao encontrado" }, 404);
+    if (
+      profissionalSaude &&
+      (await Bun.password.verify(parseData.senha, profissionalSaude.senha))
+    ) {
+      user = profissionalSaude;
+      role = "profissional";
+    } else if (
+      paciente &&
+      (await compare(parseData.senha, paciente.senha as string))
+    ) {
+      user = paciente;
+      role = "paciente";
     }
 
-    const compareHash = await Bun.password.verify(parseData.senha, user.senha);
-
-    if (!compareHash) {
-      return c.json({ error: "Senha invalida" }, 400);
+    if (!user) {
+      return c.json({ error: "Usuario ou senha invalidos" }, 400);
     }
 
     const token = {
       id: user.id,
       email: user.email,
+      role,
     };
 
     const access_token = await createToken(token);
-
-    // setar o token no cabeçalho da resposta
     c.header("Authorization", `Bearer ${access_token}`);
-
-    return c.json({ access_token });
+    return c.json({ message: "Login efetuado com sucesso", access_token });
   } catch (err) {
-    console.error(err);
+    console.error("Error during login:", err);
     if (err instanceof ZodError) {
       return c.json({ error: err.errors }, 400);
     }
@@ -98,45 +121,5 @@ export const loginGoogle = async (c: Context) => {
     console.error(error);
 
     return c.json({ error: "Internal Server Error" }, 500);
-  }
-};
-
-export const loginPacliente = async (c: Context) => {
-  try {
-    const body = await c.req.json();
-
-    const parseData = loginSchema.parse(body);
-
-    const user = await prisma.paciente.findFirst({
-      where: { email: parseData.email },
-    });
-
-    if (!user) {
-      return c.json({ error: "Usuario nao encontrado" }, 404);
-    }
-
-    const compareHash = await bcrypt.compare(
-      parseData.senha,
-      user.senha as string
-    );
-
-    if (!compareHash) {
-      return c.json({ error: "Senha invalida" }, 400);
-    }
-
-    const token = {
-      id: user.id,
-      email: user.email,
-    };
-
-    const access_token = await createToken(token);
-
-    // setar o token no cabeçalho da resposta
-    c.header("Authorization", `Bearer ${access_token}`);
-
-    return c.json({ access_token });
-  } catch (err) {
-    console.error();
-    throw err;
   }
 };
