@@ -18,15 +18,7 @@ import { relatorioRoutes } from "./routes/relatorio";
 const app = new Hono();
 
 app.use(logger());
-app.use(
-  "*",
-  cors({
-    origin: "http://localhost:3000",
-    credentials: true,
-    allowHeaders: ["Content-Type", "Authorization"],
-    allowMethods: ["GET", "POST", "PUT", "DELETE"],
-  })
-);
+app.use(cors());
 app.use(csrf());
 app.use(secureHeaders());
 
