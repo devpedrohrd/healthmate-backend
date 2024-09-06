@@ -1,8 +1,10 @@
 {
   "name": "@healthmate/backend",
   "scripts": {
+    "prisma": "bunx prisma generate",
     "dev": "bun run --hot src/index.ts",
-    "start": "bun run src/index.ts"
+    "build": "bun install && bun run prisma",
+    "deploy": "bun run src/index.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.12.0",
