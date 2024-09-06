@@ -19,8 +19,12 @@ const app = new Hono();
 
 app.use(logger());
 app.use(cors());
-app.use(csrf());
-app.use(secureHeaders());
+// app.use(csrf());
+// app.use(secureHeaders());
+
+app.get("/", async (c) => {
+  return c.json({ message: "API Online!" });
+});
 
 app.route("/login", loginRoutes);
 app.route("/pacientes", pacientRoutes);
