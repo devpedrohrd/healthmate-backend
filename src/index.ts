@@ -1,4 +1,3 @@
-import { serve } from "@hono/node-server";
 import { swaggerUI } from "@hono/swagger-ui";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -21,7 +20,7 @@ app.use(logger());
 console.log("oi");
 app.use(cors());
 // app.use(csrf());
-// app.use(secureHeaders());
+app.use(secureHeaders());
 console.log("oi2");
 app.get("/", async (c) => {
   return c.json({ message: "API Online!" });
@@ -40,11 +39,7 @@ app.get("/swagger", async (c) => {
   return c.json(swagger);
 });
 
-const port = parseInt(Bun.env.PORT as string, 10) || 3333;
-
-serve({
+export default {
+  port: process.env.PORT || 3000,
   fetch: app.fetch,
-  port: port,
-});
-
-console.log(`Server running on http://localhost:${port}`);
+};
