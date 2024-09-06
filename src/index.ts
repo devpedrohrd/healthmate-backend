@@ -18,14 +18,15 @@ import { relatorioRoutes } from "./routes/relatorio";
 const app = new Hono();
 
 app.use(logger());
+console.log("oi");
 app.use(cors());
 // app.use(csrf());
 // app.use(secureHeaders());
-
+console.log("oi2");
 app.get("/", async (c) => {
   return c.json({ message: "API Online!" });
 });
-
+console.log("oi3");
 app.route("/login", loginRoutes);
 app.route("/pacientes", pacientRoutes);
 app.route("/medicamentos", medicamentRoutes);
