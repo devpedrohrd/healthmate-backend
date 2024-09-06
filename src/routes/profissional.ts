@@ -1,15 +1,6 @@
 import { Context, Hono, Next } from "hono";
 
-import {
-  createProfissional,
-  deleteProfissional,
-  getProfissional,
-  getProfissionalByData,
-  getProfissionalByEmail,
-  getProfissionalByNome,
-  getProfissionals,
-  updateProfissional,
-} from "../controllers/profissional";
+import { createProfissional, deleteProfissional, getProfissional, getProfissionalByData, getProfissionalByEmail, getProfissionalByNome, getProfissionals, updateProfissional } from "../controllers/profissional";
 import { verifyToken } from "./verifyToken";
 
 export const profissionalRoutes = new Hono();
@@ -41,7 +32,7 @@ const verify = async (c: Context, next: Next) => {
   return c.json({ error: "Unauthorized: Invalid role" }, 403);
 };
 
-profissionalRoutes.use("*", verifyToken);
+// profissionalRoutes.use("*", verifyToken);
 
 profissionalRoutes.post("/", (c) => createProfissional(c));
 profissionalRoutes.get("/", verify, (c) => getProfissionals(c));
