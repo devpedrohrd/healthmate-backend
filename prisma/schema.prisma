@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(50)
+  email     String   @unique @db.VarChar(50)
+  password  String   @db.VarChar(100)
+  phone     String   @db.VarChar(15)
+  role      Role     @default(PATIENT)
+  age       Int
+  gender    Gender
+  endereco  Json?
+  image     String?  @db.VarChar(100)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Professional Professional?
+  Patient      Patient?
+}
+
+enum Role {
+  PROFESSIONAL
+  PATIENT
+  ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+model Professional {
+  id         Int       @id @default(autoincrement())
+  userId     Int       @unique
+  user       User      @relation(fields: [userId], references: [id])
+  bio        String    @db.VarChar(500)
+  speciality String    @db.VarChar(50)
+  patients   Patient[]
+}
+
+model Patient {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id])
+  weight    Float
+  height    Float
+  bloodType String   @db.VarChar(5)
+  birthDate DateTime
+
+  Professional Professional[]
+}
