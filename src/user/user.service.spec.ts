@@ -33,7 +33,7 @@ describe('UserService', () => {
     role: 'PROFESSIONAL',
     age: 25,
     gender: 'MALE',
-    endereco: {
+    address: {
       street: '789 Oak St',
       city: 'Chicago',
       state: 'IL',
@@ -43,6 +43,11 @@ describe('UserService', () => {
     isActive: false,
     createdAt: undefined,
     updatedAt: undefined,
+    bio: '',
+    weight: 0,
+    height: 0,
+    bloodType: '',
+    birthDate: undefined,
   }
 
   const createUser: CreateUserDto = {
@@ -54,11 +59,16 @@ describe('UserService', () => {
     role: 'PROFESSIONAL',
     age: 0,
     gender: 'MALE',
-    endereco: '',
+    address: '',
     image: '',
     isActive: false,
     createdAt: undefined,
     updatedAt: undefined,
+    bio: '',
+    weight: 0,
+    height: 0,
+    bloodType: '',
+    birthDate: undefined,
   }
 
   describe('create', () => {
@@ -99,7 +109,7 @@ describe('UserService', () => {
           role: 'PROFESSIONAL',
           age: 30,
           gender: 'MALE',
-          endereco: {
+          address: {
             street: '123 Main St',
             city: 'New York',
             state: 'NY',
@@ -109,6 +119,11 @@ describe('UserService', () => {
           isActive: true,
           createdAt: undefined,
           updatedAt: undefined,
+          bio: '',
+          weight: 0,
+          height: 0,
+          bloodType: '',
+          birthDate: undefined,
         },
         {
           id: 2,
@@ -119,7 +134,7 @@ describe('UserService', () => {
           role: 'ADMIN',
           age: 28,
           gender: 'FEMALE',
-          endereco: {
+          address: {
             street: '456 Elm St',
             city: 'Los Angeles',
             state: 'CA',
@@ -129,6 +144,11 @@ describe('UserService', () => {
           isActive: true,
           createdAt: undefined,
           updatedAt: undefined,
+          bio: '',
+          weight: 0,
+          height: 0,
+          bloodType: '',
+          birthDate: undefined,
         },
         {
           id: 3,
@@ -139,7 +159,7 @@ describe('UserService', () => {
           role: 'PROFESSIONAL',
           age: 25,
           gender: 'MALE',
-          endereco: {
+          address: {
             street: '789 Oak St',
             city: 'Chicago',
             state: 'IL',
@@ -149,6 +169,11 @@ describe('UserService', () => {
           isActive: false,
           createdAt: undefined,
           updatedAt: undefined,
+          bio: '',
+          weight: 0,
+          height: 0,
+          bloodType: '',
+          birthDate: undefined,
         },
       ]
 

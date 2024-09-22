@@ -13,6 +13,25 @@ import {
 } from 'class-validator'
 
 export class CreateUserDto implements User {
+  @IsString()
+  @IsOptional()
+  bio: string
+
+  @IsInt()
+  @IsOptional()
+  weight: number
+
+  @IsInt()
+  @IsOptional()
+  height: number
+
+  @IsString()
+  @IsOptional()
+  bloodType: string
+
+  @IsDate()
+  @IsOptional()
+  birthDate: Date
   @IsInt()
   @IsOptional()
   id: number
@@ -37,7 +56,7 @@ export class CreateUserDto implements User {
   gender: $Enums.Gender
   @IsJSON()
   @IsOptional()
-  endereco: JsonValue
+  address: JsonValue
   @IsString()
   @IsOptional()
   image: string
