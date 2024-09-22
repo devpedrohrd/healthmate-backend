@@ -170,12 +170,9 @@ describe('UserService', () => {
       expect(await service.findOne(3)).toEqual(createUser)
     })
 
-    it('should throw an error if user is not found', async () => {
+    it('should return an empty object if user is not found', async () => {
       jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(null)
-
-      await expect(service.findOne(3)).rejects.toThrow(
-        new HttpException(`USER_NOT_FOUND`, 400),
-      )
+      expect(await service.findOne(3)).toEqual({})
     })
   })
 

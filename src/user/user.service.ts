@@ -3,7 +3,6 @@ import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { PrismaService } from 'src/Prisma.service'
 import * as bcrypt from 'bcrypt'
-import { User } from '@prisma/client'
 
 @Injectable()
 export class UserService {
@@ -52,7 +51,6 @@ export class UserService {
   }
 
   async findOne(id: number) {
-    await this.findUserOrThrow(id)
     const user = await this.prismaService.user.findUnique({
       where: { id },
     })
@@ -86,5 +84,15 @@ export class UserService {
     if (!remove) {
       throw new HttpException(`USER_NOT_DELETED`, HttpStatus.BAD_REQUEST)
     }
+  }
+
+  async validateUser(email: string, password: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: { email },
+    })
+    if (user && (await bcrypt.compare(password, user.password))) {
+      return user
+    }
+    return null
   }
 }
