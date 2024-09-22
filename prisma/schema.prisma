@@ -16,7 +16,7 @@ model User {
   role      Role     @default(PATIENT)
   age       Int
   gender    Gender
-  endereco  Json?
+  address   Json?
   image     String?  @db.VarChar(100)
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())

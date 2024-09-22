@@ -19,14 +19,9 @@ export class UserService {
   }
 
   private async checkUserExists(email: string) {
-    const user = await this.prismaService.user.findUnique({
+    return await this.prismaService.user.findUnique({
       where: { email },
     })
-    if (user) {
-      throw new HttpException(`USER_ALREADY_EXISTS`, HttpStatus.BAD_REQUEST)
-    }
-
-    return user
   }
 
   async create(createUserDto: CreateUserDto): Promise<void> {
