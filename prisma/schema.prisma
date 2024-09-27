@@ -64,10 +64,31 @@ model Medicament {
   updatedAt   DateTime         @updatedAt
 
   user User @relation(fields: [userId], references: [id])
+
+  Reminder Reminder[]
 }
 
 enum MedicamentStatus {
   CONCLUDED
   ACTIVE
+  CANCELED
+}
+
+model Reminder {
+  id           Int            @id @default(autoincrement())
+  medicamentId Int            @db.Integer
+  time         DateTime       @db.Time
+  title        String?        @db.VarChar(15)
+  message      String?        @db.VarChar(255)
+  status       ReminderStatus @default(PENDING)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  medicament Medicament @relation(fields: [medicamentId], references: [id])
+}
+
+enum ReminderStatus {
+  CONCLUDED
+  PENDING
   CANCELED
 }

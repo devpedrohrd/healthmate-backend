@@ -44,7 +44,10 @@ export class MedicamentService {
 
   async findAll() {
     const medicaments = await this.prismaService.medicament.findMany()
-    return medicaments.length ? medicaments : []
+    const count = medicaments.length
+    return medicaments.length
+      ? { medicaments, count }
+      : { count: 0, medicaments: [] }
   }
 
   async findOne(id: number) {
