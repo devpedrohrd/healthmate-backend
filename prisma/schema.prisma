@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -32,6 +33,8 @@ model User {
 
   UserPatient      User[] @relation("ProfessionalToPatients")
   UserProfessional User[] @relation("PatientToProfessionals")
+
+  Medicament Medicament[]
 }
 
 enum Role {
@@ -44,4 +47,27 @@ enum Gender {
   MALE
   FEMALE
   OTHER
+}
+
+model Medicament {
+  id          Int              @id @default(autoincrement())
+  userId      Int              @db.Integer
+  name        String           @db.VarChar(50)
+  description String?          @db.VarChar(500)
+  image       String?          @db.VarChar(100)
+  message     String?          @db.VarChar(255)
+  quantity    Int              @default(0)
+  dosage      String?          @db.VarChar(50)
+  horary      DateTime         @db.Time
+  status      MedicamentStatus @default(ACTIVE)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+enum MedicamentStatus {
+  CONCLUDED
+  ACTIVE
+  CANCELED
 }

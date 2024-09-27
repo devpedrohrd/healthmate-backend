@@ -46,7 +46,8 @@ export class UserService {
 
   async findAll() {
     const users = await this.prismaService.user.findMany()
-    return users.length ? users : []
+    const count = users.length
+    return users.length ? { count, users } : { count: 0, users: [] }
   }
 
   async findOne(id: number) {

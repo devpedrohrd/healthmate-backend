@@ -1,34 +1,52 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { MedicamentService } from './medicament.service';
-import { CreateMedicamentDto } from './dto/create-medicament.dto';
-import { UpdateMedicamentDto } from './dto/update-medicament.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common'
+import { MedicamentService } from './medicament.service'
+import { CreateMedicamentDto } from './dto/create-medicament.dto'
+import { UpdateMedicamentDto } from './dto/update-medicament.dto'
 
 @Controller('medicament')
 export class MedicamentController {
   constructor(private readonly medicamentService: MedicamentService) {}
 
   @Post()
-  create(@Body() createMedicamentDto: CreateMedicamentDto) {
-    return this.medicamentService.create(createMedicamentDto);
+  async create(@Body() createMedicamentDto: CreateMedicamentDto) {
+    await this.medicamentService.create(createMedicamentDto)
+
+    return { message: 'MEDICAMENT_CREATED_SUCESSFULLY' }
   }
 
   @Get()
-  findAll() {
-    return this.medicamentService.findAll();
+  async findAll() {
+    return await this.medicamentService.findAll()
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.medicamentService.findOne(+id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.medicamentService.findOne(id)
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMedicamentDto: UpdateMedicamentDto) {
-    return this.medicamentService.update(+id, updateMedicamentDto);
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateMedicamentDto: UpdateMedicamentDto,
+  ) {
+    await this.medicamentService.update(id, updateMedicamentDto)
+
+    return { message: 'MEDICAMENT_UPDATED_SUCESSFULLY' }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.medicamentService.remove(+id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.medicamentService.remove(id)
+
+    return { message: 'MEDICAMENT_REMOVED_SUCESSFULLY' }
   }
 }

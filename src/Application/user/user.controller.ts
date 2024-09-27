@@ -29,7 +29,7 @@ export class UserController {
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    await this.userService.findOne(id)
+    return await this.userService.findOne(id)
   }
 
   @Put(':id')
