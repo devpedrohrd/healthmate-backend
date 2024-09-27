@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, Req, Res } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { User } from '@prisma/client'
-import { UserService } from 'src/user/user.service'
+import { UserService } from 'src/Application/user/user.service'
 import { Response, Request } from 'express'
 
 @Injectable()

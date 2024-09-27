@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { AuthService } from './auth.service'
 import { JwtService } from '@nestjs/jwt'
-import { UserService } from 'src/user/user.service'
-import { PrismaService } from 'src/Prisma.service'
+import { UserService } from 'src/Application/user/user.service'
+import { PrismaService } from 'src/Config/Prisma.service'
 import { HttpException, HttpStatus } from '@nestjs/common'
 import { Response, Request } from 'express'
 
