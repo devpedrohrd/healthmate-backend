@@ -47,7 +47,11 @@ export class UserService {
   async findAll() {
     const users = await this.prismaService.user.findMany()
     const count = users.length
-    return users.length ? { count, users } : { count: 0, users: [] }
+
+    const usersWithoutPassword = users.map(({ password, ...rest }) => rest)
+    return users.length
+      ? { count, usersWithoutPassword }
+      : { count: 0, users: [] }
   }
 
   async findOne(id: number) {
@@ -55,7 +59,9 @@ export class UserService {
       where: { id },
     })
 
-    return user ? user : {}
+    const { password, ...rest } = user
+
+    return user ? rest : {}
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
