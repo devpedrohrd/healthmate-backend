@@ -2,6 +2,9 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { CreateMedicamentDto } from './dto/create-medicament.dto'
 import { UpdateMedicamentDto } from './dto/update-medicament.dto'
 import { PrismaService } from 'src/Config/Prisma.service'
+import { SearchMedicaments } from './dto/filterMedicaments'
+import { builderFilterMedicaments } from '../filters/medicamentsFilter'
+import { PrismaClientValidationError } from '@prisma/client/runtime/library'
 
 @Injectable()
 export class MedicamentService {
@@ -83,6 +86,36 @@ export class MedicamentService {
 
     if (!medicament) {
       throw new HttpException('MEDICAMENT_NOT_DELETED', HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  async searchMedicament(filter: SearchMedicaments) {
+    try {
+      const filters = builderFilterMedicaments(filter)
+      const [medicaments, count] = await Promise.all([
+        this.prismaService.medicament.findMany({
+          where: filters,
+          orderBy: { createdAt: 'asc' },
+          skip: filter.offset ? filter.offset : 0,
+          take: filter.limit,
+        }),
+        this.prismaService.medicament.count({ where: filters }),
+      ])
+
+      const totalPages = Math.ceil(count / (filter.limit || 10))
+      const currentPage =
+        Math.floor((filter.offset || 0) / (filter.limit || 10)) + 1
+
+      return { count, totalPages, currentPage, data: medicaments }
+    } catch (e) {
+      if (e instanceof PrismaClientValidationError) {
+        throw new HttpException(e.message, HttpStatus.BAD_REQUEST)
+      }
+
+      throw new HttpException(
+        'INTERNAL_SERVER_ERROR',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      )
     }
   }
 }

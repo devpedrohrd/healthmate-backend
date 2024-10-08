@@ -7,10 +7,13 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common'
 import { MedicamentService } from './medicament.service'
 import { CreateMedicamentDto } from './dto/create-medicament.dto'
 import { UpdateMedicamentDto } from './dto/update-medicament.dto'
+import { filter } from 'rxjs'
+import { SearchMedicaments } from './dto/filterMedicaments'
 
 @Controller('medicament')
 export class MedicamentController {
@@ -21,6 +24,16 @@ export class MedicamentController {
     await this.medicamentService.create(createMedicamentDto)
 
     return { message: 'MEDICAMENT_CREATED_SUCESSFULLY' }
+  }
+
+  @Get()
+  async searchMedicament(@Query() filter: SearchMedicaments) {
+    const limit = filter.limit || 10
+    const courentPage = filter.page || 1
+    filter.offset = limit * (courentPage - 1)
+    filter.limit = limit
+
+    return await this.medicamentService.searchMedicament(filter)
   }
 
   @Get()
