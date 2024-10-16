@@ -3,7 +3,7 @@ import { CreateMedicamentDto } from './dto/create-medicament.dto'
 import { UpdateMedicamentDto } from './dto/update-medicament.dto'
 import { PrismaService } from 'src/Config/Prisma.service'
 import { SearchMedicaments } from './dto/filterMedicaments'
-import { builderFilterMedicaments } from '../filters/medicamentsFilter'
+import { builderFilterMedicaments } from '../filters/Medicament/filter'
 import { PrismaClientValidationError } from '@prisma/client/runtime/library'
 
 @Injectable()

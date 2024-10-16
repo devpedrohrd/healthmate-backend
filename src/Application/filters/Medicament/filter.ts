@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client'
-import { SearchMedicaments } from '../medicament/dto/filterMedicaments'
+import { SearchMedicaments } from '../../medicament/dto/filterMedicaments'
 
 export function builderFilterMedicaments(
   filter: SearchMedicaments,
