@@ -7,10 +7,12 @@ import {
   Delete,
   ParseIntPipe,
   Put,
+  Query,
 } from '@nestjs/common'
 import { ReminderService } from './reminder.service'
 import { CreateReminderDto } from './dto/create-reminder.dto'
 import { UpdateReminderDto } from './dto/update-reminder.dto'
+import { SearchReminders } from './dto/filterReminder'
 
 @Controller('reminder')
 export class ReminderController {
@@ -26,6 +28,19 @@ export class ReminderController {
   @Get()
   async findAll() {
     return await this.reminderService.findAll()
+  }
+
+  @Get('search')
+  async searchReminder(@Query() filter: SearchReminders) {
+    const limit = filter.limit ? filter.limit : 10
+    const courrentPage = filter.page ? filter.page : 1
+
+    const offset = (courrentPage - 1) * 1
+
+    filter.limit = limit
+    filter.offset = offset
+
+    return await this.reminderService.searchReminder(filter)
   }
 
   @Get(':id')

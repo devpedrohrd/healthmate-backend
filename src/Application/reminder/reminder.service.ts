@@ -2,6 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { CreateReminderDto } from './dto/create-reminder.dto'
 import { UpdateReminderDto } from './dto/update-reminder.dto'
 import { PrismaService } from 'src/Config/Prisma.service'
+import { SearchReminders } from './dto/filterReminder'
+import { builderFilterReminder } from '../filters/Reminder/filter'
 
 @Injectable()
 export class ReminderService {
@@ -88,5 +90,30 @@ export class ReminderService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       )
     }
+  }
+
+  async searchReminder(filter: SearchReminders) {
+    const filterReminder = builderFilterReminder(filter)
+
+    const [reminders, count] = await Promise.all([
+      await this.prismaService.reminder.findMany({
+        where: filterReminder,
+        include: {
+          medicament: true,
+        },
+        orderBy: { createdAt: 'asc' },
+        take: filter.limit,
+        skip: filter.offset ? filter.offset : 0,
+      }),
+      await this.prismaService.reminder.count({
+        where: filterReminder,
+      }),
+    ])
+
+    const totalPages = Math.ceil(count / filter.limit || 10)
+    const courrentPage =
+      Math.floor((filter.offset || 0) / (filter.limit || 10)) + 1
+
+    return { count, totalPages, courrentPage, data: reminders }
   }
 }
